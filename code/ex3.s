@@ -1,19 +1,25 @@
-	seti R0, #0
-	seti R1, #1
-	seti R2, #0
-	seti R3, #0
-	seti R4, #9
-	goto L1
+	@ Binaries values
+	SETI R0, #0
+	SETI R1, #1
+
+	@ Pointor coord
+	SETI R2, #0
+	SETI R3, #0
+	
+	@ Map borders (minus 1)
+	INVOKE 1, 8, 9
+	SUB R8, R8, R1
+	SUB R9, R9, R1
 
 L1:
-	invoke 3, 2, 3
-	invoke 4, 1, 0
-	add R2, R2, R1
-	goto_le L1, R2, R4
-	goto L2
+	INVOKE 3, 2, 3
+	INVOKE 4, 1, 0
+	ADD R2, R2, R1
+	GOTO_LE L1, R2, R8
+	GOTO L2
 	
 L2:
-	seti R2, #0
-	add R3, R3, R1
-	goto_le L1, R3, R4
-	stop
+	SETI R2, #0
+	ADD R3, R3, R1
+	GOTO_LE L1, R3, R9
+	STOP
