@@ -120,12 +120,14 @@ statements:
 statement:
 	cell ASSIGN expression
 		{
+			printf "\n";
 			if (fst $1) != 0 then error "assigned x must be 0";
 			if (snd $1) != 0 then error "assigned Y must be 0";
 			SET_CELL (0, $3)
 		}
 |	ID ASSIGN expression
 		{
+			printf "\n";
 			NOP
 		}
 ;
@@ -143,38 +145,57 @@ cell:
 expression:
 	transmutation
 		{ NONE }
+|	ADD transmutation
+		{ NONE }
+|	SUB transmutation
+		{ NONE }
 |	expression ADD transmutation
 		{
-			printf "+\n";
+			printf "+";
 			NONE
 		}
 |	expression SUB transmutation
 		{ 
-			printf "-\n";
+			printf "-";
 			NONE
 		}
 ;
 transmutation:
 	factor
 		{ $1 }
+|	transmutation PRO factor
+		{
+			printf "*";
+			NONE
+		}
+|	transmutation QUO factor
+		{
+			printf "/";
+			NONE
+		}
+| transmutation MOD factor
+		{
+			printf "//";
+			NONE
+		}
 ;
 
 factor:
 	cell
 		{ 
-			printf "[%d, %d]\n" (fst $1) (snd $1);
+			printf "[%d, %d]" (fst $1) (snd $1);
 			CELL (0, fst $1, snd $1)
 		}
 |  	LPARENTHESIS expression RPARENTHESIS
 		{ $2 }
 |	INT
 		{ 
-			printf "%d\n" $1;
+			printf "%d" $1;
 			CST $1
 		}
 |	ID
 		{ 
-			printf "%s\n" $1;
+			printf "%s" $1;
 			NONE
 		}
 ;
