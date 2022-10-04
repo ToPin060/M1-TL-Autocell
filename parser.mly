@@ -112,7 +112,7 @@ opt_statements:
 
 statements:
 	statement statements
-		{ $1 }
+		{ SEQ($1, $2) }
 |	statement
 		{ $1 }
 ;
@@ -120,15 +120,15 @@ statements:
 statement:
 	cell ASSIGN expression
 		{
-			printf "\n";
+			(*printf "\n";*)
 			if (fst $1) != 0 then error "assigned x must be 0";
 			if (snd $1) != 0 then error "assigned Y must be 0";
 			SET_CELL (0, $3)
 		}
 |	ID ASSIGN expression
 		{
-			printf "\n";
-			NOP
+			(*printf "\n";*)
+			SET_VAR (declare_var($1), $3)
 		}
 ;
 
@@ -143,60 +143,60 @@ cell:
 ;
 
 expression:
-	transmutation
-		{ NONE }
-|	ADD transmutation
-		{ NONE }
-|	SUB transmutation
-		{ NONE }
-|	expression ADD transmutation
+	term
+		{ $1 }
+|	ADD term
+		{ $2 }
+|	SUB term
+		{ NEG $2 }
+|	expression ADD term
 		{
-			printf "+";
-			NONE
+			(*printf "+";*)
+			BINOP (OP_ADD, $1, $3)
 		}
-|	expression SUB transmutation
+|	expression SUB term
 		{ 
-			printf "-";
-			NONE
+			(*printf "-";*)
+			BINOP (OP_SUB, $1, $3)
 		}
 ;
-transmutation:
+term:
 	factor
 		{ $1 }
-|	transmutation PRO factor
+|	term PRO factor
 		{
-			printf "*";
-			NONE
+			(*printf "*";*)
+			BINOP (OP_MUL, $1, $3)
 		}
-|	transmutation QUO factor
+|	term QUO factor
 		{
-			printf "/";
-			NONE
+			(*printf "/";*)
+			BINOP (OP_DIV, $1, $3)
 		}
-| transmutation MOD factor
+| 	term MOD factor
 		{
-			printf "//";
-			NONE
+			(*printf "//";*)
+			BINOP (OP_MOD, $1, $3)
 		}
 ;
 
 factor:
 	cell
 		{ 
-			printf "[%d, %d]" (fst $1) (snd $1);
+			(*printf "[%d, %d]" (fst $1) (snd $1);*)
 			CELL (0, fst $1, snd $1)
 		}
 |  	LPARENTHESIS expression RPARENTHESIS
 		{ $2 }
 |	INT
 		{ 
-			printf "%d" $1;
+			(*printf "%d" $1;*)
 			CST $1
 		}
 |	ID
 		{ 
-			printf "%s" $1;
-			NONE
+			(*printf "%s" $1;*)
+			VAR (get_var($1))
 		}
 ;
 
