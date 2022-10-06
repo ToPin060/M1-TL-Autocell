@@ -55,6 +55,7 @@ let pos x y =
 (** Compile an expression.
 	@param e	Expression to compile.
 	@return		(register containing the result, quads producing the result). *)
+
 let rec comp_expr e =
 	match e with
 	| NONE ->
@@ -69,23 +70,25 @@ let rec comp_expr e =
 		let ra = new_reg () in
 		(ra, [SETI (ra, x)])
 	| BINOP (op, e1, e2) ->
-		(match op with
 		let ra = new_reg ()	in
 		let r1, q1 = comp_expr e1 in
-		let r1, q2 = comp_expr e2 in
-		| OP_ADD -> (ra, q1 @ q2 @ [ADD (ra, r1, r2)])
-		| OP_SUB -> (ra, q1 @ q2 @ [SUB (ra, r1, r2)])
-		| OP_MUL -> (ra, q1 @ q2 @ [MUL (ra, r1, r2)])
-		| OP_DIV -> (ra, q1 @ q2 @ [DIV (ra, r1, r2)])
-		| OP_MOD -> (ra, q1 @ q2 @ [MOD (ra, r1, r2)])
-		| _ -> (0, []))
+		let r2, q2 = comp_expr e2 in
+		(ra, q1 @ q2 @ [
+			match op with
+			| OP_ADD -> ADD (ra, r1, r2)
+			| OP_SUB -> SUB (ra, r1, r2)
+			| OP_MUL -> MUL (ra, r1, r2)
+			| OP_DIV -> DIV (ra, r1, r2)
+			| OP_MOD -> MOD (ra, r1, r2)
+		])
+		(* binop_expr op ra (r1 q1) (r2 q2) *)
 	|	NEG (e) -> 
 		let ra = new_reg () in
 		let r0 = new_reg () in
 		let r, q = comp_expr(e) in
 		(ra, [SETI (r0, 0);	SUB (ra, r0, r)])
-	| _ ->
-		failwith "bad expression"
+	(* | _ ->
+		failwith "bad expression" *)
 
 
 (** Compile a condition.
@@ -115,6 +118,11 @@ let rec comp_stmt s =
 		let (v, q) = comp_expr e in
 		q @ [
 			INVOKE (cSET, v, f)
+		]
+	| SET_VAR (r, e) ->
+		let (re, qe) = comp_expr e in
+		qe @ [
+			SET (r, re)
 		]
 	| _ ->
 		failwith "bad instruction"
