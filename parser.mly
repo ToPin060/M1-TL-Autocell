@@ -62,6 +62,14 @@ let rec make_when f v ws =
 %token QUO
 %token MOD
 
+/* comparations */
+%token CEQ
+%token CNE
+%token CLT
+%token CLE
+%token CGT
+%token CGE
+
 /* values */
 %token <string> ID
 %token <int> INT

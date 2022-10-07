@@ -42,7 +42,7 @@ rule token = parse
 
 |	":="			{ ASSIGN }
 |	'.'				{ DOT }
-|	".."			{ DOT_DOT}
+|	".."			{ DOT_DOT }
 |	','				{ COMMA }
 |	'['				{ LBRACKET }
 |	']'				{ RBRACKET }
@@ -54,6 +54,13 @@ rule token = parse
 |	'*'				{ PRO }
 |	'/'				{ QUO }
 |	'%'				{ MOD }
+
+|	"=="			{ CEQ }
+|	"!="			{ CNE }
+|	'<'				{ CLT }
+|	"<="			{ CLE }
+|	'>'				{ CGT }
+|	">="			{ CGE }
 
 |	dec	as n		{ INT (int_of_string n) }
 |	id as s			{ ID s }
